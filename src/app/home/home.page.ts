@@ -4,6 +4,9 @@ import {
   ElementRef
 } from '@angular/core';
 import leaflet from 'leaflet';
+import {
+  StatusBar
+} from '@ionic-native/status-bar/ngx';
 
 @Component({
   selector: 'app-home',
@@ -16,8 +19,12 @@ export class HomePage {
   ionViewDidEnter() {
     this.loadmap();
   }
+  constructor(private statusBar: StatusBar) {}
 
   loadmap() {
+
+    this.statusBar.overlaysWebView(true);
+    this.statusBar.styleDefault();//In order to see the time of the status bar
 
     var bounds = new leaflet.LatLngBounds(new leaflet.LatLng(0, 0), new leaflet.LatLng(430, 760));
     this.map = leaflet.map("map", {
@@ -33,18 +40,20 @@ export class HomePage {
     var image = leaflet.imageOverlay('assets/test.jpg', bounds).addTo(this.map);
     this.map.fitBounds(bounds);
 
-
     var tail = leaflet.latLng([310, 160]);
     var nose = leaflet.latLng([310, 400]);
+
     leaflet.marker(tail).bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup().on('click', () => {
-      this.map.addLayer(travel);
+      if (this.map.hasLayer(travel)) this.map.removeLayer(travel);
+      else
+        this.map.addLayer(travel);
     }).addTo(this.map);
 
 
     leaflet.marker(nose).addTo(this.map).bindPopup('test').on('click', () => {
       this.map.removeLayer(travel);
     });
-    var route=[
+    var route = [
       tail,
       leaflet.latLng([274, 135]),
       leaflet.latLng([240, 132]),
