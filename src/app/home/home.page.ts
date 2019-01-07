@@ -7,6 +7,7 @@ import leaflet from 'leaflet';
 import {
   StatusBar
 } from '@ionic-native/status-bar/ngx';
+import * as RasterCoords from 'leaflet-rastercoords';
 
 @Component({
   selector: 'app-home',
@@ -19,54 +20,41 @@ export class HomePage {
   ionViewDidEnter() {
     this.loadmap();
   }
-  constructor(private statusBar: StatusBar) {}
-
+  constructor(private statusBar: StatusBar) {
+    leaflet.RasterCoords=RasterCoords;
+  }
+  
   loadmap() {
 
-    this.statusBar.overlaysWebView(true);
-    this.statusBar.styleDefault();//In order to see the time of the status bar
-
-    var bounds = new leaflet.LatLngBounds(new leaflet.LatLng(0, 0), new leaflet.LatLng(430, 760));
-    this.map = leaflet.map("map", {
-      crs: leaflet.CRS.Simple,
-      center: bounds.getCenter(),
-      zoom: 0,
-      attributionControl: false, //Link to leaflet library 
-      maxZoom: 5,
-      maxBounds: bounds,
-      maxBoundsViscosity: 0.8
-    });
-
-    var image = leaflet.imageOverlay('assets/test.jpg', bounds).addTo(this.map);
-    this.map.fitBounds(bounds);
-
-    var tail = leaflet.latLng([310, 160]);
-    var nose = leaflet.latLng([310, 400]);
-
-    leaflet.marker(tail).bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup().on('click', () => {
-      if (this.map.hasLayer(travel)) this.map.removeLayer(travel);
-      else
-        this.map.addLayer(travel);
-    }).addTo(this.map);
-
-
-    leaflet.marker(nose).addTo(this.map).bindPopup('test').on('click', () => {
-      this.map.removeLayer(travel);
-    });
-    var route = [
-      tail,
-      leaflet.latLng([274, 135]),
-      leaflet.latLng([240, 132]),
-      leaflet.latLng([90, 221]),
-      leaflet.latLng([10, 245]),
-      leaflet.latLng([21, 499]),
-      leaflet.latLng([258, 514]),
-      nose,
+    var img = [
+      3831,  // original width of image (here from `example/karta.jpg`)
+      3101   // original height of image
     ]
-    var travel = leaflet.polyline(route);
-    this.map.on('click', (e) => {
-      console.log("Latitude " + e.latlng.lat + " Longtitude " + e.latlng.lng);
-    });
+    // create the map
+    this.map = leaflet.map('map')
+    
+    // assign map and image dimensions
+    var rc = new leaflet.RasterCoords(this.map, img)
+    // set max zoom Level (might be `x` if gdal2tiles was called with `-z 0-x` option)
+    this.map.setMaxZoom(rc.zoomLevel())
+    // all coordinates need to be unprojected using the `unproject` method
+    // set the view in the lower right edge of the image
+    this.map.setView(rc.unproject([img[0], img[1]]), 2)
+    
+    // set markers on click events in the map
+    this.map.on('click', function (event) {
+      // any position in leaflet needs to be projected to obtain the image coordinates
+      var coords = rc.project(event.latlng)
+      var marker = leaflet.marker(rc.unproject(coords))
+        .addTo(this.map)
+      marker.bindPopup('[' + Math.floor(coords.x) + ',' + Math.floor(coords.y) + ']')
+        .openPopup()
+    })
+    
+    // the tile layer containing the image generated with `gdal2tiles --leaflet -p raster -w none <img> tiles`
+    leaflet.tileLayer('assets/tiles/{z}/{x}/{y}.png', {
+      noWrap: true
+    }).addTo(this.map)
 
   };
 }
