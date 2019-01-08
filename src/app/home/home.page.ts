@@ -9,6 +9,7 @@ import {
 } from '@ionic-native/status-bar/ngx';
 import { NGXLogger } from 'ngx-logger';
 import { Device } from '@ionic-native/device/ngx';
+import { AlertController } from '@ionic/angular';
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -20,7 +21,7 @@ export class HomePage {
   ionViewDidEnter() {
    // this.loadmap();
   }
-  constructor(private statusBar: StatusBar,private logger:NGXLogger,private device:Device) {}
+  constructor(private statusBar: StatusBar,private logger:NGXLogger,private device:Device,private alertController: AlertController) {}
 /*
   loadmap() {
 
@@ -72,6 +73,38 @@ export class HomePage {
   };
 */
 
+async testPrompt(){
+  
+  const alert = await this.alertController.create({
+    header: 'Error Handling!',
+    message: 'Would you like to send information about your bug crash?',
+    backdropDismiss:false,
+    buttons: [
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        cssClass: 'secondary',
+        handler: (blah) => {
+          console.log('Confirm Cancel: blah');
+        }
+      }, {
+        text: 'Okay',
+        handler: () => {
+          this.logger.error('Now we got a problem',{device:{
+            model:this.device.model,
+            platform:this.device.platform,
+            uuid:this.device.uuid,
+            version:this.device.version,
+            manufacturer:this.device.manufacturer
+          }});
+        }
+      }
+    ]
+  });
+
+  await alert.present();
+};
+
   log(lvl) {
     switch (lvl) {
       case 0:
@@ -87,13 +120,7 @@ export class HomePage {
         this.logger.warn('My warning message');
         break;
       case 4:
-        this.logger.error('Now we got a problem',{device:{
-          model:this.device.model,
-          platform:this.device.platform,
-          uuid:this.device.uuid,
-          version:this.device.version,
-          manufacturer:this.device.manufacturer
-        }});
+        this.testPrompt();
     }
   }
 }
