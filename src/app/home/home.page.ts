@@ -7,6 +7,7 @@ import leaflet from 'leaflet';
 import {
   StatusBar
 } from '@ionic-native/status-bar/ngx';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-home',
@@ -17,10 +18,10 @@ export class HomePage {
   @ViewChild('map') mapContainer: ElementRef;
   map: any;
   ionViewDidEnter() {
-    this.loadmap();
+   // this.loadmap();
   }
-  constructor(private statusBar: StatusBar) {}
-
+  constructor(private statusBar: StatusBar,private logger:NGXLogger) {}
+/*
   loadmap() {
 
     this.statusBar.overlaysWebView(true);
@@ -69,4 +70,30 @@ export class HomePage {
     });
 
   };
+*/
+
+  log(lvl) {
+    switch (lvl) {
+      case 0:
+        this.logger.debug('My debug message');
+        break;
+      case 1:
+        this.logger.info('My info message');
+        break;
+      case 2:
+        this.logger.log('My log message');
+        break;
+      case 3:
+        this.logger.warn('My warning message');
+        break;
+      case 4:
+        this.logger.error('Now we got a problem',{device:{
+         // model:this.device.model,
+        //  platform:this.device.platform,
+          //uuid:this.device.uuid,
+        //  version:this.device.version,
+       //   manufacturer:this.device.manufacturer
+        }});
+    }
+  }
 }
