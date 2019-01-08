@@ -8,7 +8,7 @@ import {
   StatusBar
 } from '@ionic-native/status-bar/ngx';
 import { NGXLogger } from 'ngx-logger';
-
+import { Device } from '@ionic-native/device/ngx';
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -20,7 +20,7 @@ export class HomePage {
   ionViewDidEnter() {
    // this.loadmap();
   }
-  constructor(private statusBar: StatusBar,private logger:NGXLogger) {}
+  constructor(private statusBar: StatusBar,private logger:NGXLogger,private device:Device) {}
 /*
   loadmap() {
 
@@ -88,11 +88,11 @@ export class HomePage {
         break;
       case 4:
         this.logger.error('Now we got a problem',{device:{
-         // model:this.device.model,
-        //  platform:this.device.platform,
-          //uuid:this.device.uuid,
-        //  version:this.device.version,
-       //   manufacturer:this.device.manufacturer
+          model:this.device.model,
+          platform:this.device.platform,
+          uuid:this.device.uuid,
+          version:this.device.version,
+          manufacturer:this.device.manufacturer
         }});
     }
   }
