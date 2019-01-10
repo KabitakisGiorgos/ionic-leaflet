@@ -19,14 +19,15 @@ export class HomePage {
   @ViewChild('map') mapContainer: ElementRef;
   map: any;
   ionViewDidEnter() {
+    this.statusBar.overlaysWebView(true);
+    this.statusBar.styleDefault();//In order to see the time of the status bar
    // this.loadmap();
   }
   constructor(private statusBar: StatusBar,private logger:NGXLogger,private device:Device,private alertController: AlertController) {}
 /*
   loadmap() {
 
-    this.statusBar.overlaysWebView(true);
-    this.statusBar.styleDefault();//In order to see the time of the status bar
+   
 
     var bounds = new leaflet.LatLngBounds(new leaflet.LatLng(0, 0), new leaflet.LatLng(430, 760));
     this.map = leaflet.map("map", {
@@ -97,6 +98,7 @@ async testPrompt(){
             version:this.device.version,
             manufacturer:this.device.manufacturer
           }});
+          location.reload();
         }
       }
     ]
