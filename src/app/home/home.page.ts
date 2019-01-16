@@ -8,6 +8,7 @@ import {
   StatusBar
 } from '@ionic-native/status-bar/ngx';
 import * as Graph from 'node-dijkstra';
+import { nodePoints } from '../../MapConfig/mapPoints';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +26,17 @@ export class HomePage {
   }
   constructor(private statusBar: StatusBar) {
     this.route = new Graph();
-    this.route.addNode('Start', { B:1 });
+    this.route.addNode('Start', { B1:1});
+    this.route.addNode('B1', { B2:1});
+
+    //testing Route
+    this.route.addNode('B2', { B:10,t0:1});//Change the weught of B to see the alternative route
+    this.route.addNode('t0', { t1:1 });
+    this.route.addNode('t1', { t2:1 });
+    this.route.addNode('t2', { B:1 });
+
+    //testing Route
+    
     this.route.addNode('B', { C:1});
     this.route.addNode('C', { D:1 });
     this.route.addNode('D', { End:1 });
@@ -50,16 +61,8 @@ export class HomePage {
     var image = leaflet.imageOverlay('assets/test.jpg', bounds).addTo(this.map);
     this.map.fitBounds(bounds);
 
-    var start = leaflet.latLng([240, 161]);
-    var end = leaflet.latLng([338, 471]);
-
-    var nodePoints={//FIXME:add this to seperate file 
-        Start:[240,161],
-        End:[338,471],
-        B:[247,402],
-        C:[351,403],
-        D:[351,470]
-    };
+    var start = leaflet.latLng(nodePoints.Start);
+    var end = leaflet.latLng(nodePoints.End);
 
     leaflet.marker(start).bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup().on('click', () => {
       if (this.map.hasLayer(this.RouteLine)) this.map.removeLayer(this.RouteLine);
@@ -84,17 +87,7 @@ export class HomePage {
         this.map.addLayer(this.RouteLine);
       }
     });
-   //var routeTmp = [
-    //   start,
-    //   leaflet.latLng([274, 135]),
-    //   leaflet.latLng([240, 132]),
-    //   leaflet.latLng([90, 221]),
-    //   leaflet.latLng([10, 245]),
-    //   leaflet.latLng([21, 499]),
-    //   leaflet.latLng([258, 514]),
-    //   end,
-    // ]
-    //var travel = leaflet.polyline(routeTmp);
+   
     this.map.on('click', (e) => {
       this.points.push(leaflet.latLng([e.latlng.lat,e.latlng.lng]));
       console.log(this.points);
