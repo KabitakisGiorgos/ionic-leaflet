@@ -48,6 +48,7 @@ export class HomePage {
     this.statusBar.styleDefault();//In order to see the time of the status bar
 
     var bounds = new leaflet.LatLngBounds(new leaflet.LatLng(0, 0), new leaflet.LatLng(450, 700));//Height,width
+    var myrenderer=leaflet.canvas({padding:1});
     this.map = leaflet.map("map", {
       crs: leaflet.CRS.Simple,
       center: bounds.getCenter(),
@@ -55,7 +56,10 @@ export class HomePage {
       attributionControl: false, //Link to leaflet library 
       maxZoom: 5,
       maxBounds: bounds,
-      maxBoundsViscosity: 0.8
+      maxBoundsViscosity: 0.8,
+      preferCanvas:true,
+      renderer:myrenderer,
+      easeLinearity:0.4
     });
 
     var image = leaflet.imageOverlay('assets/test.jpg', bounds).addTo(this.map);
@@ -79,6 +83,7 @@ export class HomePage {
        var myrenderer=leaflet.canvas({padding:1});//Fix for the rendering of the polyline not braking
        this.RouteLine=leaflet.polyline(tmproute,{
           renderer:myrenderer,
+          preferCanvas:true,
           color:'red'
        });
        this.map.addLayer(this.RouteLine);
@@ -124,5 +129,19 @@ export class HomePage {
       this.map.zoomControl.enable();
     }
   };
+
+  setView(){
+
+    //this.map.setView() <--- takes also zoom level 
+    // this.map.setZoom(3);
+    // setInterval(()=>{
+    //   this.map.panTo([338, 471],{
+    //     animate:true,
+    //     duration:1,
+        
+    //   });
+    // },200);
+    this.map.setView([338, 471],3);
+  }
 
 }
