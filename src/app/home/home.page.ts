@@ -76,7 +76,11 @@ export class HomePage {
         console.log(nodePoints[element]);
         tmproute.push(leaflet.latLng(nodePoints[element]));
        });
-       this.RouteLine=leaflet.polyline(tmproute);
+       var myrenderer=leaflet.canvas({padding:1});//Fix for the rendering of the polyline not braking
+       this.RouteLine=leaflet.polyline(tmproute,{
+          renderer:myrenderer,
+          color:'red'
+       });
        this.map.addLayer(this.RouteLine);
       }
     }).addTo(this.map);
@@ -97,5 +101,28 @@ export class HomePage {
 
   clear(){
     this.points=[];
-  }
+  };
+
+  lock(){
+    if( this.map.dragging._enabled){
+      this.map.dragging.disable();
+      this.map.touchZoom.disable();
+      this.map.doubleClickZoom.disable();
+      this.map.scrollWheelZoom.disable();
+      this.map.boxZoom.disable();
+      this.map.keyboard.disable();
+      if (this.map.tap) this.map.tap.disable();
+      this.map.zoomControl.disable();
+    }else{
+      this.map.dragging.enable();
+      this.map.touchZoom.enable();
+      this.map.doubleClickZoom.enable();
+      this.map.scrollWheelZoom.enable();
+      this.map.boxZoom.enable();
+      this.map.keyboard.enable();
+      if (this.map.tap) this.map.tap.enable();
+      this.map.zoomControl.enable();
+    }
+  };
+
 }
