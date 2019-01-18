@@ -46,8 +46,9 @@ export class HomePage {
   loadmap() {
     this.statusBar.overlaysWebView(true);
     this.statusBar.styleDefault();//In order to see the time of the status bar
-
-    var bounds = new leaflet.LatLngBounds(new leaflet.LatLng(0, 0), new leaflet.LatLng(450, 700));//Height,width
+    //0.95 is the percentage of the width
+    //1.41 is the ratio of the picture width/height
+    var bounds = new leaflet.LatLngBounds(new leaflet.LatLng(0, 0), new leaflet.LatLng((window.innerWidth*0.95)/1.41,0.95*window.innerWidth));//Height,width
     var myrenderer=leaflet.canvas({padding:1});
     this.map = leaflet.map("map", {
       crs: leaflet.CRS.Simple,
