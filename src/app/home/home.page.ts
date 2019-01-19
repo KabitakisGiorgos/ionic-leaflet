@@ -55,7 +55,7 @@ export class HomePage {
   loadmap() {
     this.statusBar.overlaysWebView(true);
     this.statusBar.styleDefault();//In order to see the time of the status bar
-   
+
     var bounds = new leaflet.LatLngBounds(new leaflet.LatLng(0, 0), new leaflet.LatLng(this.CanvasHeight, this.CanvasWidth));//Height,width
     var myrenderer = leaflet.canvas({ padding: 1 });
     this.map = leaflet.map("map", {
@@ -112,6 +112,17 @@ export class HomePage {
   };
 
   checkAudio() {
+    try {
+      (<any>window).HeadsetDetection.detect(function (detected) {
+        if (detected) {
+          alert("Headphone connected");
+        } else {
+          alert("No Headphone Found.");
+        }
+      });
+    } catch (error) {
+      alert(error);
+    }
   };
 
   lock() {

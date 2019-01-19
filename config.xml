@@ -84,5 +84,6 @@
     <plugin name="cordova-plugin-geolocation" spec="4.0.1" />
     <plugin name="cordova-plugin-statusbar" spec="^2.4.2" />
     <allow-navigation href="http://139.91.81.2:8101" sessionid="54174e91" />
+    <plugin name="cordova-plugin-headsetdetection" spec="~3.0.0" />
     <engine name="android" spec="7.1.4" />
 </widget>
