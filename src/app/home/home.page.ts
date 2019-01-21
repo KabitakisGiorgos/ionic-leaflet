@@ -59,9 +59,9 @@ export class HomePage {
   loadmap() {
     this.statusBar.overlaysWebView(true);
     this.statusBar.styleDefault();//In order to see the time of the status bar
+    //this.statusBar.backgroundColorByName('red'); Change Color of the phone bar
 
     var bounds = new leaflet.LatLngBounds(new leaflet.LatLng(0, 0), new leaflet.LatLng(this.CanvasHeight, this.CanvasWidth));//Height,width
-    // var myrenderer = leaflet.canvas({ padding: 1 });
     this.map = leaflet.map("map", {
       crs: leaflet.CRS.Simple,
       center: bounds.getCenter(),
@@ -70,8 +70,6 @@ export class HomePage {
       maxZoom: 5,
       maxBounds: bounds,
       maxBoundsViscosity: 0.8,
-      // preferCanvas: true,
-      // renderer: myrenderer,
       easeLinearity: 0.4
     });
 
@@ -95,18 +93,14 @@ export class HomePage {
         tmp.forEach(element => {
           tmproute.push(leaflet.latLng([nodePoints[element][0] * this.CanvasHeight, nodePoints[element][1] * this.CanvasWidth]));
         });
-        var myrenderer = leaflet.canvas({ padding: 1 });//Fix for the rendering of the polyline not braking
 
         this.RouteLineLine = leaflet.polyline(tmproute, {
-          // renderer: myrenderer,
-          // preferCanvas: true,
           color: 'red',
-          weight:2
+          weight: 2
         });
 
         this.RouteLineDash = leaflet.polylineDecorator(tmproute, {
           patterns: [
-            // {offset:0,repeat:8,symbol: leaflet.Symbol.dash({ pixelSize: 5, pathOptions: { color: '#000', weight: 4, opacity: 1 } })},
             { offset: 25, repeat: 50, symbol: leaflet.Symbol.arrowHead({ pixelSize: 8, pathOptions: { color: 'red', fillOpacity: 1, weight: 0 } }) }
           ]
         });
@@ -114,10 +108,7 @@ export class HomePage {
         this.RouteLineFootSteps = leaflet.polylineDecorator(
           tmproute,
           {
-            // renderer: myrenderer,
-            // preferCanvas: true,
             patterns: [
-              // { offset: 0, repeat: 50, symbol: leaflet.Symbol.dash({ pixelSize: 5, pathOptions: { color: '#000', weight: 4, opacity: 0.4 } }) },
               {
                 offset: 0, repeat: 30, symbol: leaflet.Symbol.marker({
                   rotate: true, markerOptions: {
