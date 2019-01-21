@@ -9,6 +9,7 @@ import {
 } from '@ionic-native/status-bar/ngx';
 import * as Graph from 'node-dijkstra';
 import { nodePoints } from '../../MapConfig/mapPoints';
+import 'leaflet-polylinedecorator';
 
 @Component({
   selector: 'app-home',
@@ -36,20 +37,20 @@ export class HomePage {
 
     this.route = new Graph();
     this.route.addNode('Start', { B1: 1 });
-    this.route.addNode('B1', { B2: 1 });
+    this.route.addNode('B1', { B2: 1, Start: 1 });
 
     //testing Route
-    this.route.addNode('B2', { B: 10, t0: 1 });//Change the weught of B to see the alternative route
-    this.route.addNode('t0', { t1: 1 });
-    this.route.addNode('t1', { t2: 1 });
-    this.route.addNode('t2', { B: 1 });
+    this.route.addNode('B2', { B: 10, t0: 1, B1: 1 });//Change the weught of B to see the alternative route
+    this.route.addNode('t0', { t1: 1, B2: 1 });
+    this.route.addNode('t1', { t2: 1, t0: 1 });
+    this.route.addNode('t2', { B: 1, t1: 1 });
 
     //testing Route
 
-    this.route.addNode('B', { C: 1 });
-    this.route.addNode('C', { D: 1 });
-    this.route.addNode('D', { End: 1 });
-    this.route.addNode('End', {});
+    this.route.addNode('B', { C: 1, t2: 1 });
+    this.route.addNode('C', { D: 1, B: 1 });
+    this.route.addNode('D', { End: 1, C: 1 });
+    this.route.addNode('End', { D: 1 });
   }
 
   loadmap() {
@@ -81,7 +82,7 @@ export class HomePage {
       if (this.map.hasLayer(this.RouteLine)) this.map.removeLayer(this.RouteLine);
       else {
 
-        var tmp = this.route.path('Start', 'End');
+        var tmp = this.route.path('Start', 'End');//'End' 'Start' for opposite direction
         console.log(tmp);
         var tmproute: Array<leaflet.latLng> = [];
 
@@ -89,12 +90,33 @@ export class HomePage {
           tmproute.push(leaflet.latLng([nodePoints[element][0] * this.CanvasHeight, nodePoints[element][1] * this.CanvasWidth]));
         });
         var myrenderer = leaflet.canvas({ padding: 1 });//Fix for the rendering of the polyline not braking
-        this.RouteLine = leaflet.polyline(tmproute, {
-          renderer: myrenderer,
-          preferCanvas: true,
-          color: 'red'
-        });
-        this.map.addLayer(this.RouteLine);
+        // this.RouteLine = leaflet.polyline(tmproute, {
+        //   renderer: myrenderer,
+        //   preferCanvas: true,
+        //   color: 'red'
+        // });
+        // 
+        this.RouteLine = leaflet.polylineDecorator(
+          tmproute,
+          {
+            renderer: myrenderer,
+            preferCanvas: true,
+            patterns: [
+              // { offset: 0, repeat: 50, symbol: leaflet.Symbol.dash({ pixelSize: 5, pathOptions: { color: '#000', weight: 4, opacity: 0.4 } }) },
+              {
+                offset: 0, repeat: 30, symbol: leaflet.Symbol.marker({
+                  rotate: true, markerOptions: {
+                    icon: leaflet.icon({
+                      iconUrl: 'assets/foot8.png',
+                      iconAnchor: [4, 4]
+                    })
+                  }
+                })
+              }
+            ]
+          }
+        ).addTo(this.map);
+        //this.map.addLayer(this.RouteLine);
       }
     }).addTo(this.map);
 
