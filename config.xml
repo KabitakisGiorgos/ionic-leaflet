@@ -3,7 +3,7 @@
     <name>myApp</name>
     <description>An awesome Ionic/Cordova app.</description>
     <author email="hi@ionicframework" href="http://ionicframework.com/">Ionic Framework Team</author>
-    <content src="index.html" />
+    <content original-src="index.html" src="http://139.91.96.177:8101" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -85,5 +85,6 @@
     <plugin name="cordova-plugin-statusbar" spec="^2.4.2" />
     <allow-navigation href="http://139.91.81.2:8101" sessionid="54174e91" />
     <plugin name="cordova-plugin-headsetdetection" spec="~3.0.0" />
+    <allow-navigation href="http://139.91.96.177:8101" sessionid="c9bef41c" />
     <engine name="android" spec="7.1.4" />
 </widget>

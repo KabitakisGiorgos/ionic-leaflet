@@ -22,6 +22,9 @@ export class HomePage {
   points: Array<any> = [];
   route: any;
   RouteLine: any;
+  RouteLineDash: any;
+  RouteLineFootSteps: any;
+  RouteLineLine: any;
   CanvasWidth: any;
   CanvasHeight: any;
   ionViewDidEnter() {
@@ -32,7 +35,7 @@ export class HomePage {
     //Dimensions
     //0.95 is the percentage of the width
     //1.41 is the ratio of the picture width/height
-    this.CanvasHeight = ((window.innerWidth * 0.95) / 1.41);
+    this.CanvasHeight = ((window.innerWidth * 0.95) / 2.12);
     this.CanvasWidth = 0.95 * window.innerWidth;
 
     this.route = new Graph();
@@ -58,7 +61,7 @@ export class HomePage {
     this.statusBar.styleDefault();//In order to see the time of the status bar
 
     var bounds = new leaflet.LatLngBounds(new leaflet.LatLng(0, 0), new leaflet.LatLng(this.CanvasHeight, this.CanvasWidth));//Height,width
-    var myrenderer = leaflet.canvas({ padding: 1 });
+    // var myrenderer = leaflet.canvas({ padding: 1 });
     this.map = leaflet.map("map", {
       crs: leaflet.CRS.Simple,
       center: bounds.getCenter(),
@@ -67,19 +70,22 @@ export class HomePage {
       maxZoom: 5,
       maxBounds: bounds,
       maxBoundsViscosity: 0.8,
-      preferCanvas: true,
-      renderer: myrenderer,
+      // preferCanvas: true,
+      // renderer: myrenderer,
       easeLinearity: 0.4
     });
 
-    var image = leaflet.imageOverlay('assets/test.jpg', bounds).addTo(this.map);
+    var image = leaflet.imageOverlay('assets/map.png', bounds).addTo(this.map);
     this.map.fitBounds(bounds);
 
     var start = leaflet.latLng([nodePoints.Start[0] * this.CanvasHeight, nodePoints.Start[1] * this.CanvasWidth]);
     var end = leaflet.latLng([nodePoints.End[0] * this.CanvasHeight, nodePoints.End[1] * this.CanvasWidth]);
 
     leaflet.marker(start).bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup().on('click', () => {
-      if (this.map.hasLayer(this.RouteLine)) this.map.removeLayer(this.RouteLine);
+      if (this.map.hasLayer(this.RouteLine)) {
+        this.map.removeLayer(this.RouteLineLine);
+        this.map.removeLayer(this.RouteLine);
+      }
       else {
 
         var tmp = this.route.path('Start', 'End');//'End' 'Start' for opposite direction
@@ -90,17 +96,26 @@ export class HomePage {
           tmproute.push(leaflet.latLng([nodePoints[element][0] * this.CanvasHeight, nodePoints[element][1] * this.CanvasWidth]));
         });
         var myrenderer = leaflet.canvas({ padding: 1 });//Fix for the rendering of the polyline not braking
-        // this.RouteLine = leaflet.polyline(tmproute, {
-        //   renderer: myrenderer,
-        //   preferCanvas: true,
-        //   color: 'red'
-        // });
-        // 
-        this.RouteLine = leaflet.polylineDecorator(
+
+        this.RouteLineLine = leaflet.polyline(tmproute, {
+          // renderer: myrenderer,
+          // preferCanvas: true,
+          color: 'red',
+          weight:2
+        });
+
+        this.RouteLineDash = leaflet.polylineDecorator(tmproute, {
+          patterns: [
+            // {offset:0,repeat:8,symbol: leaflet.Symbol.dash({ pixelSize: 5, pathOptions: { color: '#000', weight: 4, opacity: 1 } })},
+            { offset: 25, repeat: 50, symbol: leaflet.Symbol.arrowHead({ pixelSize: 8, pathOptions: { color: 'red', fillOpacity: 1, weight: 0 } }) }
+          ]
+        });
+
+        this.RouteLineFootSteps = leaflet.polylineDecorator(
           tmproute,
           {
-            renderer: myrenderer,
-            preferCanvas: true,
+            // renderer: myrenderer,
+            // preferCanvas: true,
             patterns: [
               // { offset: 0, repeat: 50, symbol: leaflet.Symbol.dash({ pixelSize: 5, pathOptions: { color: '#000', weight: 4, opacity: 0.4 } }) },
               {
@@ -115,22 +130,36 @@ export class HomePage {
               }
             ]
           }
-        ).addTo(this.map);
-        //this.map.addLayer(this.RouteLine);
+        )
+
+        this.RouteLine = this.RouteLineDash;
+        this.map.addLayer(this.RouteLine);
+        this.map.addLayer(this.RouteLineLine);
       }
     }).addTo(this.map);
 
     leaflet.marker(end).addTo(this.map).bindPopup('test').on('click', () => {
-      if (this.map.hasLayer(this.RouteLine)) this.map.removeLayer(this.RouteLine);
+      if (this.map.hasLayer(this.RouteLine)) {
+        this.map.removeLayer(this.RouteLineLine);
+        this.map.removeLayer(this.RouteLine);
+      }
       else {
         this.map.addLayer(this.RouteLine);
       }
     });
 
-    // this.map.on('click', (e) => {//Not necessaary any more
-    //   this.points.push(leaflet.latLng([e.latlng.lat,e.latlng.lng]));
-    //   console.log(this.points);
-    // })
+    this.map.on('zoomend', () => {
+      console.log(this.map.getZoom());
+      this.map.removeLayer(this.RouteLine);
+      this.map.removeLayer(this.RouteLineLine);
+      if (this.map.getZoom() > 2) {
+        this.RouteLine = this.RouteLineFootSteps;
+      } else {
+        this.RouteLine = this.RouteLineDash;
+        this.map.addLayer(this.RouteLineLine);
+      }
+      this.map.addLayer(this.RouteLine);
+    });
   };
 
   checkAudio() {
